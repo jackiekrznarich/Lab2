@@ -1,6 +1,6 @@
 ---
 title: "Homework 2"
-author: "Kristi Gdanetz MacCready"
+author: "Jacqueline Krznarich"
 date: "01/15/2020"
 output: html_document
 ---
@@ -21,26 +21,43 @@ set.seed(7)
 # Question 1
 Import the Lab2 data file, name the resulting data frame hw2_df. What are the dimensions (number of rows and columns) of this data frame?
 ```{r}
-
+hw2_df <- read_delim(file = "raw_data/Lab2_data.txt", 
+                        delim = "\t", trim_ws = TRUE, na=c("NA"))
 ```
-
-
+4422 Obs of 16 variables
 # Question 2
 Filter the hw2_df data frame for data from Fall 2018, only include study weeks 1 and 3, subset for BRMPS, drop any data from students that did not consume the full quantity of the supplement, or samples that are not within the weight range (0.1 - 1.0 grams). Keep columns with participant & sample data, and butyrate measurements. Hint: use the accessor functions to identify column and variable names. Name the resulting data frame hw2_f18. 
 ```{r}
+hw2_f18 <- hw2_df %>% 
+  filter(semester == "Fall2018") %>%
+  filter(study_week == "week1" | study_week == "week3") %>%
+  filter(supplement_consumed == "BRMPS") %>%
+  filter(quantity_compliant == "yes" | (sample_weight_g < 1 & sample_weight_g > 0)) %>%
+select(participant_id, sample_id, sample_number, butyrate_mM)
+  
 
 ```
 
 Repeat the filtering and subsetting above for students from Winter 2019. Name the resulting data frame hw2_w19. 
 ```{r}
-
+hw2_w19 <- hw2_df %>% 
+  filter(semester == "Winter2019") %>%
+  filter(study_week == "week1" | study_week == "week3") %>%
+  filter(supplement_consumed == "BRMPS") %>%
+  filter(quantity_compliant == "yes" | (sample_weight_g < 1 & sample_weight_g > 0)) %>%
+select(participant_id, sample_id, sample_number, butyrate_mM)
 ```
 
 Which semester contains more individual students?
 ```{r}
-
+f_18partic <- hw2_f18 %>%
+  group_by(participant_id) %>%
+  summarize()
+w_19partici <- hw2_w19 %>%
+  group_by(participant_id) %>%
+  summarize()
 ```
-
+Winter 2019 participants
 
 # Question 3
 Import the question3_data file, complete the following as one long series of commands using pipes: 

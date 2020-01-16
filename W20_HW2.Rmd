@@ -71,7 +71,17 @@ Import the question3_data file, complete the following as one long series of com
 
 Name the resulting data frame hw2_q3. What are the dimensions of the resulting data frame? 
 ```{r}
-
+hw_q3 <- read_delim(file = "raw_data/question3_data.txt", 
+                        delim = "\t", trim_ws = TRUE, na=c("NA")) 
+hw2_q3 <- hw_q3 %>%
+  mutate(weight_kg = wt_lbs / 2.205, height_m = ht_in / 35.274, 
+         ace_fake = round(ace_fake, digits = 2), 
+         pro_fake = round(pro_fake, digits = 2), 
+         but_fake = round(but_fake, digits = 2)) %>%
+  filter(sample_wt_g > 0, sample_wt_g < 1) %>%
+  filter(notes != "frozen >24hrs") %>%
+  select(-ht_in, -wt_lbs, -notes)
+  
 ```
 
 
@@ -79,15 +89,22 @@ Name the resulting data frame hw2_q3. What are the dimensions of the resulting d
 
 Using the hw2_q3 data frame; apply the group_by() and summarise() functions to determine the mean concentration (in mmol/kg) of each of the three SCFAs (acetate, butyrate, propionate) for each participant, during each week of the study. Use the mutate() function to calculate the total SCFA concentration for each participant, during each week of the study. Drop any intermediate columns used for calculations. Name the resulting data frame hw2_q4. What are the dimensions of the resulting data frame?
 ```{r}
+hw2_q4 <- hw2_q3 %>%
+  group_by(participant_id, study_weeks) %>%
+  summarize(pro_fake = mean(pro_fake),  
+         ace_fake = mean(ace_fake), 
+         but_fake = mean(but_fake)) %>%
+  mutate(total = pro_fake + but_fake + ace_fake)
 
+  
 ```
-
+212 obs of 8 variables
 
 # Question 5
 
 Export/save the data frame created in Question 4. Processed/curated data frames should be uploaded to 'curated_data' directory on your GitHub Page.
 ```{r}
-
+write_delim(hw2_q3, path = "hw2_q3.txt", delim = "\t")
 ```
 
 # Question 6
@@ -98,7 +115,20 @@ Complete writing assignment assigned in lecture 1 in a Word Document. Submit fil
 
 Can you conduct the analyses in Questions 3, 4, 5 as one long series of pipes (from import to export, without creating any intermediate data frames)?
 ```{r}
-
+ec_df <- hw_q3 %>%
+  mutate(weight_kg = wt_lbs / 2.205, height_m = ht_in / 35.274, 
+         ace_fake = round(ace_fake, digits = 2), 
+         pro_fake = round(pro_fake, digits = 2), 
+         but_fake = round(but_fake, digits = 2)) %>%
+  filter(sample_wt_g > 0, sample_wt_g < 1) %>%
+  filter(notes != "frozen >24hrs") %>%
+  select(-ht_in, -wt_lbs, -notes) %>%
+  group_by(participant_id, study_weeks) %>%
+  summarize(pro_fake = mean(pro_fake),  
+         ace_fake = mean(ace_fake), 
+         but_fake = mean(but_fake)) %>%
+  mutate(total = pro_fake + but_fake + ace_fake) %>%
+  write_delim(hw2_q3, path = "hw2_q3.txt", delim = "\t")
 ```
 
 -----
